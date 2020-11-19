@@ -1,0 +1,110 @@
+/* 
+ * Raspberry Pi4 Setup
+ */
+
+/* Setting Real Time Clock (RTC)
+ * RTC type DC3231
+ * Source : https://pimylifeup.com/raspberry-pi-rtc/
+ */
+
+// Configuring the Raspberry Pi for I2C
+1. sudo raspi-config ==> to enable i2c interface
+2. sudo reboot
+3. sudo apt-get install python-smbus i2c-tools
+4. sudo i2cdetect -y 1
+   If you have successfully wired up your RTC circuit, you should see the ID #68 appear. This id is the address of the DS1307, DS3231 and the PCF85231 RTC Chips.
+   Once we have the Kernel driver up and running the tool will start to display UU instead, this is an indication that it is working as intended.
+
+// Setting up the Raspberry Pi RTC Time
+1. sudo nano /boot/config.txt
+2. add below line, it's depend with your RTC type/model
+   DS1307
+   dtoverlay=i2c-rtc,ds1307
+
+   PCF8523
+   dtoverlay=i2c-rtc,pcf8523
+
+   DS3231
+   dtoverlay=i2c-rtc,ds3231
+
+   Once you have added the correct line for your device to the bottom of the file you can save and quit out of it by pressing Ctrl + X, then Y and then Enter.
+3. sudo reboot
+4. sudo i2cdetect -y 1
+   You should see a wall of text appear, if UU appears instead of 68 then we have successfully loaded in the Kernel driver for our RTC circuit.
+
+// Remove fake-hwclock
+1. sudo apt-get -y remove fake-hwclock
+2. sudo update-rc.d -f fake-hwclock remove
+3. sudo nano /lib/udev/hwclock-set
+   find :
+   if [ -e /run/systemd/system ] ; then
+    exit 0
+   fi 
+
+   Replace with :
+   #if [ -e /run/systemd/system ] ; then
+   # exit 0
+   #fi 
+
+// Syncing time from the Pi to the RTC module
+1. sudo hwclock -D -r
+2. date
+3. sudo hwclock -w
+4. sudo hwclock -r   
+
+/* 
+ * How to install apache, php & mysql 
+ */
+// install apache
+sudo apt-get install apache2
+
+// Start, stop, restart and check apache status
+sudo systemctl status apache2
+sudo systemctl restart apache2
+sudo systemctl stop apache2
+sudo systemctl start apache2
+
+// install php 
+sudo apt install php php-mbstring php-mysql php-curl php-gd php-sqlite3 php-zip php-json
+
+// install MySQL
+sudo apt-get install mariadb-server
+
+// install phpmyadmin 
+sudo apt install phpmyadmin
+// move phpmyadmin folder to:
+sudo ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin
+
+// change mysql password
+sudo mysql -u root
+use mysql
+update mysql.user set password=password('new password') where user='root';
+flush privileges;
+
+// allow root or other user to access phpmyadmin
+sudo mysql -u root -p
+use phpmyadmin
+grant all on phpmyadmin.* to root@localhost identified by '';
+flush privileges;
+
+//**Shutdown mysql**//
+sudo mysqladmin -u root -p shutdown
+sudo service mysqld start
+sudo service mysql start
+
+//**Restore database from file**//
+create database masjid;
+exit
+sudo mysql -u root -p masjid < masjid.MySQL
+
+
+// How to install argon1 fan and power button on ubuntu 
+https://github.com/meuter/argon-one-case-ubuntu-20.04
+chmod a+x argon1.sh
+sudo ./argon1.sh
+argonone-config
+argonone-tempmon
+
+//**How to fix broken library**//
+sudo apt --fix-broken install
+
