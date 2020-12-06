@@ -97,6 +97,12 @@ create database masjid;
 exit
 sudo mysql -u root -p masjid < masjid.MySQL
 
+// How to install argon1 fan and power button on raspbian
+sudo apt install curl
+sudo curl https://download.argon40.com/argon1.sh | bash
+
+// Check raspberry temperature on raspbian
+vcgencmd measure_temp
 
 // How to install argon1 fan and power button on ubuntu 
 https://github.com/meuter/argon-one-case-ubuntu-20.04
@@ -108,3 +114,5 @@ argonone-tempmon
 //**How to fix broken library**//
 sudo apt --fix-broken install
 
+// Duplicate monitor on raspberry
+xrandr --output HDMI-2 --same-as HDMI-1
