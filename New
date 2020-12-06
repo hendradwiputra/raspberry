@@ -64,7 +64,13 @@ sudo systemctl restart apache2
 sudo systemctl stop apache2
 sudo systemctl start apache2
 
-// install php 
+// add PHP 7.4 package
+sudo wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+echo "deb https://packages.sury.org/php/ buster main" | sudo tee /etc/apt/sources.list.d/php.list
+sudo apt update
+
+// install php 7.4 on raspberry
+sudo apt install -y php7.4-common php7.4-fpm php7.4-cli php7.4-curl php7.4-json php7.4-mysql php7.4-opcache php7.4-gd php7.4-sqlite3 php7.4-mbstring php7.4-zip php7.4-readline php-pear
 sudo apt install php php-mbstring php-mysql php-curl php-gd php-sqlite3 php-zip php-json
 
 // install MySQL
@@ -116,3 +122,9 @@ sudo apt --fix-broken install
 
 // Duplicate monitor on raspberry
 xrandr --output HDMI-2 --same-as HDMI-1
+
+// Reset root password
+sudo passwd root
+
+// Open chromium full screen on start up
+@chromium-browser --kiosk http://localhost/imasjid
