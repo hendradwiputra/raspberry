@@ -71,6 +71,7 @@ sudo apt update
 
 // install php 7.4 on raspberry
 sudo apt install -y php7.4-common php7.4-fpm php7.4-cli php7.4-curl php7.4-json php7.4-mysql php7.4-opcache php7.4-gd php7.4-sqlite3 php7.4-mbstring php7.4-zip php7.4-readline php-pear
+sudo apt install -y php-common php-fpm php-cli php-curl php-json php-mysql php-gd php-sqlite3 php-mbstring php-zip php-readline php-pear php-json
 
 // install MySQL
 sudo apt-get install mariadb-server
@@ -127,3 +128,6 @@ sudo passwd root
 
 // Open chromium full screen on start up
 @chromium-browser --kiosk http://localhost/imasjid
+
+// How to remove PHP 7.4
+sudo apt-get purge php7.4
