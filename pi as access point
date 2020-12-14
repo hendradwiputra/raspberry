@@ -66,3 +66,27 @@ Now find this line:
 net.ipv4.ip_forward=1
 
 // Step 7: Add a new iptables rule
+Next, we’re going to add IP masquerading for outbound traffic on eth0 using iptables:
+
+sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+…and save the new iptables rule:
+
+sudo sh -c "iptables-save > /etc/iptables.ipv4.nat"
+
+To load the rule on boot, we need to edit the file /etc/rc.local and add the following
+line just above the line exit 0:
+
+iptables-restore < /etc/iptables.ipv4.nat
+
+// Step 8: Enable internet connection
+sudo apt-get install bridge-utils
+
+sudo brctl addbr br0
+sudo nano /etc/network/interfaces
+
+auto br0
+iface br0 inet manual
+
+// Step 9: Reboot
+bridge_ports eth0 wlan0
