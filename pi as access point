@@ -1,0 +1,68 @@
+// Documentation
+// https://thepi.io/how-to-use-your-raspberry-pi-as-a-wireless-access-point/
+
+// Step 1: Install and update Raspbian
+sudo apt-get update
+sudo apt-get upgrade
+
+// Step 2: Install hostapd and dnsmasq
+sudo apt-get install hostapd
+sudo apt-get install dnsmasq
+
+Both times, you’ll have to hit y to continue. hostapd is the package that lets us create a wireless hotspot using a Raspberry Pi, and dnsmasq is an easy-to-use DHCP and DNS server.
+
+We’re going to edit the programs’ configuration files in a moment, so let’s turn the programs off
+before we start tinkering:
+
+sudo systemctl stop hostapd
+sudo systemctl stop dnsmasq
+
+// Step 3: Configure a static IP for the wlan0 interface
+sudo nano /etc/dhcpcd.conf
+
+interface wlan0
+static ip_address=192.168.0.10/24
+denyinterfaces eth0
+denyinterfaces wlan0
+
+// Step 4: Configure the DHCP server (dnsmasq)
+sudo mv /etc/dnsmasq.conf /etc/dnsmasq.conf.orig
+sudo nano /etc/dnsmasq.conf
+
+interface=wlan0
+  dhcp-range=192.168.0.11,192.168.0.30,255.255.255.0,24h
+  
+// Step 5: Configure the access point host software (hostapd)
+sudo nano /etc/hostapd/hostapd.conf
+
+interface=wlan0
+bridge=br0
+hw_mode=g
+channel=7
+wmm_enabled=0
+macaddr_acl=0
+auth_algs=1
+ignore_broadcast_ssid=0
+wpa=2
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP
+ssid=NETWORK
+wpa_passphrase=PASSWORD
+
+sudo nano /etc/default/hostapd
+
+In this file, track down the line that says #DAEMON_CONF=”” – delete that # and put the path to our config file in the quotes, so that it looks like this:
+
+DAEMON_CONF="/etc/hostapd/hostapd.conf"
+
+// Step 6: Set up traffic forwarding
+sudo nano /etc/sysctl.conf
+
+Now find this line:
+#net.ipv4.ip_forward=1
+
+…and delete the “#” – leaving the rest, so it just reads:
+net.ipv4.ip_forward=1
+
+// Step 7: Add a new iptables rule
