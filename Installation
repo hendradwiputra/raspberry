@@ -131,3 +131,16 @@ sudo passwd root
 
 // How to remove PHP 7.4
 sudo apt-get purge php7.4
+
+# verify whether module activated if not follow below
+# if there were no module you will get No module matches php7.x
+a2query -m php7.x
+
+# install version of your php example 7.4
+sudo apt-get install libapache2-mod-php7.x  
+
+# activate module
+sudo a2enmod php7.x
+
+# restart or reload apache 
+sudo service apache2 restart
